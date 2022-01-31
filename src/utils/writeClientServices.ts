@@ -36,7 +36,10 @@ export const writeClientServices = async (
     );
     service.imports = Array.from(new Set(service.imports));
     service.operations = Array.from(new Set(service.operations));
-
+    // console.dir(
+    //     service.operations.filter(x => x.path === '/crm/v3/objects/companies/batch/archive'),
+    //     { depth: 9 }
+    // );
     const templateResult = templates.exports.service({
         ...service,
         useUnionTypes,

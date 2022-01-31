@@ -5,6 +5,21 @@ import type { HttpRequest } from './core';
 import type { {{#each imports}}{{{this}}},{{/each}} } from './models';
 {{/if}}
 
+{{#each operations}}
+	export interface {{name}}Params {
+	{{#each parameters}}
+	{{#if description}}
+	/** {{{escapeComment description}}} **/
+	{{/if}}
+	{{{name}}}{{>isRequired}}: {{>type}},
+	{{/each}}
+	}
+
+	export type {{name}}Result = 
+		{{#each results}}| {{>type}}{{/each}};
+
+{{/each}}
+
 
 export class {{{name}}}{{{@root.postfix}}} {
 	constructor(private readonly http: HttpRequest) {}

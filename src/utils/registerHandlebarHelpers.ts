@@ -4,14 +4,9 @@ import { EOL } from 'os';
 
 import type { Enum } from '../client/interfaces/Enum';
 import type { Model } from '../client/interfaces/Model';
-import type { HttpClient } from '../HttpClient';
 import { unique } from './unique';
 
-export const registerHandlebarHelpers = (root: {
-    httpClient: HttpClient;
-    useOptions: boolean;
-    useUnionTypes: boolean;
-}): void => {
+export const registerHandlebarHelpers = (root: { useOptions: boolean; useUnionTypes: boolean }): void => {
     Handlebars.registerHelper(
         'equals',
         function (this: any, a: string, b: string, options: Handlebars.HelperOptions): string {

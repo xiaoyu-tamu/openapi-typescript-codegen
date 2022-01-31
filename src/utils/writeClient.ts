@@ -1,8 +1,6 @@
 import { resolve } from 'path';
 
 import type { Client } from '../client/interfaces/Client';
-import type { HttpClient } from '../HttpClient';
-import type { Indent } from '../Indent';
 import { mkdir } from './fileSystem';
 import { isSubDirectory } from './isSubdirectory';
 import type { Templates } from './registerHandlebarTemplates';
@@ -16,7 +14,6 @@ import { writeClientServices } from './writeClientServices';
  * @param client Client object with all the models, services, etc.
  * @param templates Templates wrapper with all loaded Handlebars templates
  * @param output The relative location of the output directory
- * @param httpClient The selected httpClient (fetch, xhr, node or axios)
  * @param useOptions Use options or arguments functions
  * @param useUnionTypes Use union types instead of enums
  * @param exportCore Generate core client classes
@@ -24,7 +21,6 @@ import { writeClientServices } from './writeClientServices';
  * @param exportModels Generate models
  * @param exportSchemas Generate schemas
  * @param exportSchemas Generate schemas
- * @param indent Indentation options (4, 2 or tab)
  * @param postfix Service name postfix
  * @param clientName Custom client class name
  * @param request Path to custom request file
@@ -33,14 +29,12 @@ export const writeClient = async (
     client: Client,
     templates: Templates,
     output: string,
-    httpClient: HttpClient,
     useOptions: boolean,
     useUnionTypes: boolean,
     exportCore: boolean,
     exportServices: boolean,
     exportModels: boolean,
     exportSchemas: boolean,
-    indent: Indent,
     postfix: string,
     clientName?: string,
     request?: string
@@ -58,7 +52,7 @@ export const writeClient = async (
     await mkdir(outputPath);
 
     if (exportCore) {
-        await writeClientCore(client, templates, outputPathCore, httpClient, indent, clientName, request);
+        await writeClientCore(client, templates, outputPathCore, clientName, request);
     }
 
     if (exportServices) {
@@ -66,20 +60,18 @@ export const writeClient = async (
             client.services,
             templates,
             outputPathServices,
-            httpClient,
             useUnionTypes,
             useOptions,
-            indent,
             postfix,
             clientName
         );
     }
 
     if (exportSchemas) {
-        await writeClientSchemas(client.models, templates, outputPathSchemas, httpClient, useUnionTypes, indent);
+        await writeClientSchemas(client.models, templates, outputPathSchemas, useUnionTypes);
     }
 
     if (exportModels) {
-        await writeClientModels(client.models, templates, outputPathModels, httpClient, useUnionTypes, indent);
+        await writeClientModels(client.models, templates, outputPathModels, useUnionTypes);
     }
 };

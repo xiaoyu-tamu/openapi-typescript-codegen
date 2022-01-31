@@ -1,6 +1,4 @@
 import type { Client } from '../client/interfaces/Client';
-import { HttpClient } from '../HttpClient';
-import { Indent } from '../Indent';
 import { writeFile } from './fileSystem';
 import type { Templates } from './registerHandlebarTemplates';
 import { writeClientCore } from './writeClientCore';
@@ -27,7 +25,7 @@ describe('writeClientCore', () => {
             },
         };
 
-        await writeClientCore(client, templates, '/', HttpClient.FETCH, Indent.SPACE_4);
+        await writeClientCore(client, templates, '/');
 
         expect(writeFile).toBeCalledWith('/OpenAPI.ts', 'settings');
         expect(writeFile).toBeCalledWith('/ApiError.ts', 'apiError');

@@ -7,17 +7,12 @@ const generate = async (input, output) => {
     await OpenAPI.generate({
         input,
         output,
-        httpClient: OpenAPI.HttpClient.FETCH,
         useOptions: false,
         useUnionTypes: false,
         exportCore: true,
         exportSchemas: true,
         exportModels: true,
         exportServices: true,
-        // clientName: 'DemoAppClient',
-        // indent: OpenAPI.Indent.SPACE_2,
-        // postfix: 'Api',
-        // request: './test/custom/request.ts',
     });
 };
 

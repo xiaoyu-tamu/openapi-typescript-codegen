@@ -3,13 +3,10 @@ import { resolve } from 'path';
 import type { Client } from '../client/interfaces/Client';
 import type { HttpClient } from '../HttpClient';
 import type { Indent } from '../Indent';
-import { mkdir, rmdir } from './fileSystem';
-import { isDefined } from './isDefined';
+import { mkdir } from './fileSystem';
 import { isSubDirectory } from './isSubdirectory';
 import type { Templates } from './registerHandlebarTemplates';
-import { writeClientClass } from './writeClientClass';
 import { writeClientCore } from './writeClientCore';
-import { writeClientIndex } from './writeClientIndex';
 import { writeClientModels } from './writeClientModels';
 import { writeClientSchemas } from './writeClientSchemas';
 import { writeClientServices } from './writeClientServices';
@@ -58,15 +55,13 @@ export const writeClient = async (
         throw new Error(`Output folder is not a subdirectory of the current working directory`);
     }
 
+    await mkdir(outputPath);
+
     if (exportCore) {
-        await rmdir(outputPathCore);
-        await mkdir(outputPathCore);
         await writeClientCore(client, templates, outputPathCore, httpClient, indent, clientName, request);
     }
 
     if (exportServices) {
-        await rmdir(outputPathServices);
-        await mkdir(outputPathServices);
         await writeClientServices(
             client.services,
             templates,
@@ -81,35 +76,10 @@ export const writeClient = async (
     }
 
     if (exportSchemas) {
-        await rmdir(outputPathSchemas);
-        await mkdir(outputPathSchemas);
         await writeClientSchemas(client.models, templates, outputPathSchemas, httpClient, useUnionTypes, indent);
     }
 
     if (exportModels) {
-        await rmdir(outputPathModels);
-        await mkdir(outputPathModels);
         await writeClientModels(client.models, templates, outputPathModels, httpClient, useUnionTypes, indent);
-    }
-
-    if (isDefined(clientName)) {
-        await mkdir(outputPath);
-        await writeClientClass(client, templates, outputPath, httpClient, clientName, indent, postfix);
-    }
-
-    if (exportCore || exportServices || exportSchemas || exportModels) {
-        await mkdir(outputPath);
-        await writeClientIndex(
-            client,
-            templates,
-            outputPath,
-            useUnionTypes,
-            exportCore,
-            exportServices,
-            exportModels,
-            exportSchemas,
-            postfix,
-            clientName
-        );
     }
 };

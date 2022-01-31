@@ -1,11 +1,10 @@
 import { resolve } from 'path';
+import prettier from 'prettier';
 
 import type { Model } from '../client/interfaces/Model';
 import type { HttpClient } from '../HttpClient';
 import type { Indent } from '../Indent';
 import { writeFile } from './fileSystem';
-import { formatCode as f } from './formatCode';
-import { formatIndentation as i } from './formatIndentation';
 import type { Templates } from './registerHandlebarTemplates';
 
 /**
@@ -25,13 +24,10 @@ export const writeClientModels = async (
     useUnionTypes: boolean,
     indent: Indent
 ): Promise<void> => {
-    for (const model of models) {
-        const file = resolve(outputPath, `${model.name}.ts`);
-        const templateResult = templates.exports.model({
-            ...model,
-            httpClient,
-            useUnionTypes,
-        });
-        await writeFile(file, i(f(templateResult), indent));
-    }
+    const file = resolve(`${outputPath}.ts`);
+    const templateResult = models
+        .map(model => templates.exports.model({ ...model, httpClient, useUnionTypes }))
+        .join('\n');
+    const prettireConfig = await prettier.resolveConfig(process.cwd());
+    await writeFile(file, prettier.format(templateResult, prettireConfig ?? {}));
 };

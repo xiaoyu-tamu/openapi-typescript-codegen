@@ -1,11 +1,10 @@
 import { resolve } from 'path';
+import prettier from 'prettier';
 
 import type { Service } from '../client/interfaces/Service';
 import type { HttpClient } from '../HttpClient';
 import type { Indent } from '../Indent';
 import { writeFile } from './fileSystem';
-import { formatCode as f } from './formatCode';
-import { formatIndentation as i } from './formatIndentation';
 import { isDefined } from './isDefined';
 import type { Templates } from './registerHandlebarTemplates';
 
@@ -32,16 +31,26 @@ export const writeClientServices = async (
     postfix: string,
     clientName?: string
 ): Promise<void> => {
-    for (const service of services) {
-        const file = resolve(outputPath, `${service.name}${postfix}.ts`);
-        const templateResult = templates.exports.service({
-            ...service,
-            httpClient,
-            useUnionTypes,
-            useOptions,
-            postfix,
-            exportClient: isDefined(clientName),
-        });
-        await writeFile(file, i(f(templateResult), indent));
-    }
+    const file = resolve(`${outputPath}.ts`);
+    const service = services.reduce(
+        (acc, curr) => {
+            acc.operations.push(...curr.operations);
+            acc.imports.push(...curr.imports);
+            return acc;
+        },
+        { name: 'Company', imports: [], operations: [] } as Service
+    );
+    service.imports = Array.from(new Set(service.imports));
+    service.operations = Array.from(new Set(service.operations));
+
+    const templateResult = templates.exports.service({
+        ...service,
+        httpClient,
+        useUnionTypes,
+        useOptions,
+        postfix,
+        exportClient: isDefined(clientName),
+    });
+    const prettireConfig = await prettier.resolveConfig(process.cwd());
+    await writeFile(file, prettier.format(templateResult, prettireConfig ?? {}));
 };

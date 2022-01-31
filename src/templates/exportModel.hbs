@@ -1,11 +1,10 @@
-{{>header}}
+{{!-- {{>header}} --}}
 
-{{#if imports}}
-
+{{!-- {{#if imports}}
 {{#each imports}}
 import type { {{{this}}} } from './{{{this}}}';
 {{/each}}
-{{/if}}
+{{/if}} --}}
 
 {{#equals export 'interface'}}
 {{>exportInterface}}

@@ -1,39 +1,13 @@
 {{>header}}
 
-{{#equals @root.httpClient 'angular'}}
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import type { Observable } from 'rxjs';
-
-{{/equals}}
+import type { HttpRequest } from './core';
 {{#if imports}}
-{{#each imports}}
-import type { {{{this}}} } from '../models/{{{this}}}';
-{{/each}}
-
-{{/if}}
-{{#notEquals @root.httpClient 'angular'}}
-import type { CancelablePromise } from '../core/CancelablePromise';
-{{/notEquals}}
-{{#if @root.exportClient}}
-import type { BaseHttpRequest } from '../core/BaseHttpRequest';
-{{else}}
-import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
+import type { {{#each imports}}{{{this}}},{{/each}} } from './models';
 {{/if}}
 
-{{#equals @root.httpClient 'angular'}}
-@Injectable()
-{{/equals}}
+
 export class {{{name}}}{{{@root.postfix}}} {
-	{{#if @root.exportClient}}
-
-	constructor(private readonly httpRequest: BaseHttpRequest) {}
-	{{/if}}
-	{{#equals @root.httpClient 'angular'}}
-
-	constructor(private readonly http: HttpClient) {}
-	{{/equals}}
+	constructor(private readonly http: HttpRequest) {}
 
 	{{#each operations}}
 	/**
@@ -58,52 +32,42 @@ export class {{{name}}}{{{@root.postfix}}} {
 	{{/each}}
 	 * @throws ApiError
 	 */
-	{{#if @root.exportClient}}
-	public {{{name}}}({{>parameters}}): CancelablePromise<{{>result}}> {
-		return this.httpRequest.request({
-	{{else}}
-	{{#equals @root.httpClient 'angular'}}
-	public {{{name}}}({{>parameters}}): Observable<{{>result}}> {
-		return __request(OpenAPI, this.http, {
-	{{else}}
-	public static {{{name}}}({{>parameters}}): CancelablePromise<{{>result}}> {
-		return __request(OpenAPI, {
-	{{/equals}}
-	{{/if}}
+	public {{{name}}}({{>parameters}}): Promise<{{>result}}> {
+		return this.http.request({
 			method: '{{{method}}}',
 			url: '{{{path}}}',
 			{{#if parametersPath}}
 			path: {
 				{{#each parametersPath}}
-				'{{{prop}}}': {{{name}}},
+					{{{prop}}},
 				{{/each}}
 			},
 			{{/if}}
 			{{#if parametersCookie}}
 			cookies: {
 				{{#each parametersCookie}}
-				'{{{prop}}}': {{{name}}},
+				   {{{prop}}},
 				{{/each}}
 			},
 			{{/if}}
 			{{#if parametersHeader}}
 			headers: {
 				{{#each parametersHeader}}
-				'{{{prop}}}': {{{name}}},
+				   {{{prop}}},
 				{{/each}}
 			},
 			{{/if}}
 			{{#if parametersQuery}}
 			query: {
 				{{#each parametersQuery}}
-				'{{{prop}}}': {{{name}}},
+				   {{{prop}}},
 				{{/each}}
 			},
 			{{/if}}
 			{{#if parametersForm}}
 			formData: {
 				{{#each parametersForm}}
-				'{{{prop}}}': {{{name}}},
+				   {{{prop}}},
 				{{/each}}
 			},
 			{{/if}}
